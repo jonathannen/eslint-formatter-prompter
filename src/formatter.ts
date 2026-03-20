@@ -2,7 +2,7 @@ import type { ESLint, Linter } from 'eslint';
 import defaultRuleMessages from './rule-messages.js';
 import { loadConfig, type PrompterConfig } from './config.js';
 
-const DEFAULT_HEADER = `You MUST fix all of the following ESLint violations before proceeding with any other changes. Do not skip any errors. Do not leave any warnings unresolved. Fix every issue listed below.`;
+const DEFAULT_HEADER = `The lint tool has found errors. Included in this output is direction on how to resolve these errors. You MUST fix all of the following ESLint violations before proceeding with any other changes. Do not skip any errors. Do not leave any warnings unresolved. Fix every issue listed below.`;
 
 const DEFAULT_FOOTER = `After fixing all issues, re-run ESLint to confirm zero violations remain. Do not proceed until the linter passes cleanly.`;
 

@@ -53,9 +53,7 @@ Now every time the AI writes a file, it immediately sees actionable lint feedbac
 Given a file with lint errors, the formatter produces:
 
 ```
-You MUST fix all of the following ESLint violations before proceeding with any
-other changes. Do not skip any errors. Do not leave any warnings unresolved.
-Fix every issue listed below.
+The lint tool has found errors. Included in this output is direction on how to resolve these errors. You MUST fix all of the following ESLint violations before proceeding with any other changes. Do not skip any errors. Do not leave any warnings unresolved. Fix every issue listed below.
 
 ## /app/src/utils.js
 
