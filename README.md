@@ -1,0 +1,128 @@
+# eslint-prompter
+
+An ESLint formatter that transforms lint output into AI-friendly prompts. Rather than dumping raw lint errors and expecting an AI to figure out what to do, this formatter tells it *why* a rule matters and *what to fix* — for every violation.
+
+Based on the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) approach: your tools are already talking to AI, so make those messages count.
+
+## Why?
+
+Standard ESLint output assumes a human developer who understands project conventions. When AI reads `'x' is defined but never used  no-unused-vars`, it might remove the variable, comment out the line, or add an eslint-disable — all technically valid, none necessarily correct.
+
+`eslint-prompter` solves this by:
+
+1. **Adding directive context** to every rule — not just *what* failed, but *what to do about it*
+2. **Framing output as instructions** — a header tells the AI it MUST fix all violations before proceeding, preventing it from routing around errors
+3. **Grouping by rule** — reducing noise and token waste by clustering related violations together
+4. **Being fully customizable** — override any rule message, header, or footer to match your project's conventions
+
+## Install
+
+```bash
+pnpm add --save-dev eslint-prompter
+```
+
+## Usage
+
+Use it like any ESLint formatter:
+
+```bash
+eslint --format eslint-prompter .
+```
+
+### With Claude Code hooks
+
+The real power comes from running this automatically. Use a [Claude Code PostToolUse hook](https://docs.anthropic.com/en/docs/claude-code/hooks) to lint every file write:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "command": "eslint --format eslint-prompter ${file_path}"
+      }
+    ]
+  }
+}
+```
+
+Now every time the AI writes a file, it immediately sees actionable lint feedback — creating the tight feedback loop described in [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/).
+
+## Example output
+
+Given a file with lint errors, the formatter produces:
+
+```
+You MUST fix all of the following ESLint violations before proceeding with any
+other changes. Do not skip any errors. Do not leave any warnings unresolved.
+Fix every issue listed below.
+
+## /app/src/utils.js
+
+**no-var**: Use let or const instead of var.
+- Line 1, Col 1 (error): Unexpected var, use let or const instead.
+- Line 5, Col 1 (error): Unexpected var, use let or const instead.
+
+**no-unused-vars**: Remove the unused variable, or prefix it with an underscore if it must remain.
+- Line 3, Col 7 (error): 'temp' is defined but never used.
+
+**eqeqeq**: Use strict equality (=== or !==) instead of loose equality (== or !=).
+- Line 8, Col 10 (error): Expected '===' and instead saw '=='.
+
+**Summary**: 4 error(s), 0 warning(s) across 1 file(s).
+
+After fixing all issues, re-run ESLint to confirm zero violations remain.
+Do not proceed until the linter passes cleanly.
+```
+
+Compare that to the default ESLint output and consider which one an AI is more likely to act on correctly.
+
+## Configuration
+
+Create a `.eslint-prompter.json` in your project root:
+
+```json
+{
+  "header": "Fix these lint errors. Do not proceed until all are resolved.",
+  "footer": "Run the linter again to verify.",
+  "ruleMessages": {
+    "no-console": "Remove console statements. Use the logger from @app/logging instead — see src/lib/logger.ts for usage.",
+    "import/no-cycle": "Break this circular dependency. See docs/architecture.md for the intended module graph."
+  }
+}
+```
+
+| Option | Type | Description |
+|---|---|---|
+| `header` | `string \| null` | Message shown before violations. Set to `null` to disable. |
+| `footer` | `string \| null` | Message shown after violations. Set to `null` to disable. |
+| `ruleMessages` | `Record<string, string>` | Per-rule AI instructions. Merged with (and overrides) the built-in defaults. |
+
+The built-in defaults cover ~100 rules from the Airbnb base config. Any rule without a custom message still shows the original ESLint message — nothing is lost.
+
+### Writing good rule messages
+
+Following the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) philosophy, the best rule messages:
+
+- **Explain what to do**, not just what's wrong — `"Use the db.query() wrapper from @app/db"` beats `"Avoid direct database queries"`
+- **Point to examples** — `"see src/modules/users/queries.ts for the pattern"` gives the AI a gold template to follow
+- **State the why** — `"Direct queries bypass audit logging"` prevents the AI from finding a clever workaround that still violates the intent
+
+## Programmatic API
+
+```typescript
+import { formatResults, defaultRuleMessages } from 'eslint-prompter';
+
+const output = formatResults(eslintResults, {
+  header: 'Custom header',
+  footer: null,
+  ruleMessages: {
+    ...defaultRuleMessages,
+    'my-rule': 'Custom instruction for my-rule.',
+  },
+});
+```
+
+## License
+
+MIT

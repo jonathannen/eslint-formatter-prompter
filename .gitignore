@@ -1,0 +1,4 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.eslint-prompter.json
