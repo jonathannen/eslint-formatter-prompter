@@ -1,8 +1,8 @@
 # eslint-formatter-prompter
 
-An ESLint formatter that transforms lint output into AI-friendly prompts. Rather than dumping raw lint errors and expecting an AI to figure out what to do, this formatter tells it *why* a rule matters and *what to fix* — for every violation.
+Your linter is already talking to your AI — this makes it say the right things.
 
-Based on the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) approach: your tools are already talking to AI, so make those messages count.
+`eslint-formatter-prompter` is a concrete implementation of the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) approach. It replaces ESLint's default output with structured, directive messages that tell AI _what to fix_ and _why_ — instead of dumping raw lint errors and hoping it figures it out.
 
 ## Why?
 
@@ -10,7 +10,7 @@ Standard ESLint output assumes a human developer who understands project convent
 
 `eslint-formatter-prompter` solves this by:
 
-1. **Adding directive context** to every rule — not just *what* failed, but *what to do about it*
+1. **Adding directive context** to every rule — not just _what_ failed, but _what to do about it_
 2. **Framing output as instructions** — a header tells the AI it MUST fix all violations before proceeding, preventing it from routing around errors
 3. **Grouping by rule** — reducing noise and token waste by clustering related violations together
 4. **Being fully customizable** — override any rule message, header, or footer to match your project's conventions
@@ -92,10 +92,10 @@ Create a `.eslint-formatter-prompter.json` in your project root:
 }
 ```
 
-| Option | Type | Description |
-|---|---|---|
-| `header` | `string \| null` | Message shown before violations. Set to `null` to disable. |
-| `footer` | `string \| null` | Message shown after violations. Set to `null` to disable. |
+| Option         | Type                     | Description                                                                  |
+| -------------- | ------------------------ | ---------------------------------------------------------------------------- |
+| `header`       | `string \| null`         | Message shown before violations. Set to `null` to disable.                   |
+| `footer`       | `string \| null`         | Message shown after violations. Set to `null` to disable.                    |
 | `ruleMessages` | `Record<string, string>` | Per-rule AI instructions. Merged with (and overrides) the built-in defaults. |
 
 The built-in defaults cover ~100 rules from the Airbnb base config. Any rule without a custom message still shows the original ESLint message — nothing is lost.
@@ -104,9 +104,10 @@ The built-in defaults cover ~100 rules from the Airbnb base config. Any rule wit
 
 Following the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) philosophy, the best rule messages:
 
-- **Explain what to do**, not just what's wrong — `"Use the db.query() wrapper from @app/db"` beats `"Avoid direct database queries"`
-- **Point to examples** — `"see src/modules/users/queries.ts for the pattern"` gives the AI a gold template to follow
-- **State the why** — `"Direct queries bypass audit logging"` prevents the AI from finding a clever workaround that still violates the intent
+- **Explain what to do**, not just what's wrong — `"Use the db.query() wrapper from @app/db"` beats `"Avoid direct database queries"`.
+- **Point to examples** — `"see src/modules/users/queries.ts for the pattern"` gives the AI a gold template to follow.
+- **State the why** — `"Direct queries bypass audit logging"` prevents the AI from finding a clever workaround that still violates the intent.
+- **Be clear on the ask** - "You must fix this in this manner" gives the AI clear direction on how to solve the issue.
 
 ## Future
 
