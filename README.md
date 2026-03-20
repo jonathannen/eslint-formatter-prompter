@@ -108,20 +108,9 @@ Following the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-pro
 - **Point to examples** — `"see src/modules/users/queries.ts for the pattern"` gives the AI a gold template to follow
 - **State the why** — `"Direct queries bypass audit logging"` prevents the AI from finding a clever workaround that still violates the intent
 
-## Programmatic API
+## Future
 
-```typescript
-import { formatResults, defaultRuleMessages } from 'eslint-formatter-prompter';
-
-const output = formatResults(eslintResults, {
-  header: 'Custom header',
-  footer: null,
-  ruleMessages: {
-    ...defaultRuleMessages,
-    'my-rule': 'Custom instruction for my-rule.',
-  },
-});
-```
+- **XML output** — structured XML output is being considered as an alternative format, allowing AI tools to parse lint results more precisely.
 
 ## License
 

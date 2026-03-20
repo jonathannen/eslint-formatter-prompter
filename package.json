@@ -17,8 +17,8 @@
   "scripts": {
     "build": "tsc && cp src/formatter-entry.cjs dist/formatter-entry.cjs",
     "test": "node --import tsx --test test/**/*.test.ts",
-    "lint": "eslint 'src/**/*.ts' 'test/**/*.ts'",
-    "lint:prompt": "eslint -f ./dist/formatter-entry.cjs 'src/**/*.ts' 'test/**/*.ts'",
+    "lint": "eslint --format ./dist/formatter-entry.cjs 'src/**/*.ts' 'test/**/*.ts'",
+    "lint:raw": "eslint 'src/**/*.ts' 'test/**/*.ts'",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "format:check": "prettier --check 'src/**/*.ts' 'test/**/*.ts'",
     "prepublishOnly": "pnpm run build"
@@ -38,17 +38,14 @@
     "eslint": ">=8.0.0"
   },
   "devDependencies": {
-    "@types/eslint": "^8.56.0",
+    "@eslint/js": "^10.0.1",
     "@types/node": "^20.11.0",
-    "@typescript-eslint/eslint-plugin": "^8.57.1",
-    "@typescript-eslint/parser": "^8.57.1",
-    "eslint": "^8.57.0",
-    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.1",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.57.1"
   }
 }
