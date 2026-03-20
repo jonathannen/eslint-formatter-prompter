@@ -50,7 +50,8 @@ const defaultRuleMessages: Record<string, string> = {
     'Remove the .bind() call — this function does not reference `this`, so the binding has no effect.',
   'no-fallthrough':
     'Add a break statement at the end of the case. If fallthrough is intentional, add a `// falls through` comment instead of a break.',
-  'no-global-assign': 'Do not reassign global variables like Object, undefined, or window. Use a local variable with a different name.',
+  'no-global-assign':
+    'Do not reassign global variables like Object, undefined, or window. Use a local variable with a different name.',
   'no-implied-eval':
     'Pass a function to setTimeout/setInterval instead of a string. Change `setTimeout("code", delay)` to `setTimeout(() => { code }, delay)`.',
   'no-iterator':
@@ -114,8 +115,7 @@ const defaultRuleMessages: Record<string, string> = {
     'Move the var declaration to the top of the function scope. Better yet, convert to let/const with block scoping.',
   'wrap-iife':
     'Wrap the immediately-invoked function expression in parentheses: `(function() { ... }())`.',
-  yoda:
-    'Reverse the comparison to natural order — put the variable first: change `"red" === color` to `color === "red"`. Flip the operator for inequalities.',
+  yoda: 'Reverse the comparison to natural order — put the variable first: change `"red" === color` to `color === "red"`. Flip the operator for inequalities.',
 
   // Variables
   'no-delete-var':
@@ -154,10 +154,8 @@ const defaultRuleMessages: Record<string, string> = {
     'Split the chained assignment into separate statements. `a = b = c = 5` should become three separate assignments, each with its own declaration if needed.',
   'no-nested-ternary':
     'Replace the nested ternary with if/else statements or extract the inner ternary into a named variable. Do not just add parentheses — the nesting must be eliminated.',
-  'no-new-object':
-    'Use object literal syntax: `{}` instead of `new Object()`.',
-  'no-plusplus':
-    'Replace ++ with += 1 and -- with -= 1.',
+  'no-new-object': 'Use object literal syntax: `{}` instead of `new Object()`.',
+  'no-plusplus': 'Replace ++ with += 1 and -- with -= 1.',
   'no-restricted-syntax':
     'This syntax is restricted by the project ESLint config. Check the rule configuration for the required alternative and follow its custom message.',
   'no-underscore-dangle':
@@ -165,8 +163,7 @@ const defaultRuleMessages: Record<string, string> = {
   'no-unneeded-ternary':
     'Simplify the ternary. `x ? true : false` should be just `x`. `x ? false : true` should be `!x`. `x ? x : fallback` should be `x || fallback`.',
   'one-var': 'Use one variable declaration per statement: `let a; let b;` instead of `let a, b;`.',
-  'operator-assignment':
-    'Use the shorthand operator: change `x = x + y` to `x += y`.',
+  'operator-assignment': 'Use the shorthand operator: change `x = x + y` to `x += y`.',
   'prefer-object-spread':
     'Replace Object.assign({}, obj) with spread syntax: `{ ...obj }`. Only applies when the first argument is an object literal.',
   'spaced-comment': 'Add a space after the comment marker: `// comment` not `//comment`.',
@@ -199,8 +196,7 @@ const defaultRuleMessages: Record<string, string> = {
     'Use shorthand syntax: change `{x: x}` to `{x}` and `{method: function() {}}` to `{method() {}}`. Do not convert arrow function values — they have different `this` binding.',
   'prefer-arrow-callback':
     'Convert the callback to an arrow function. Do not convert if the callback uses its own `this` binding — arrow functions inherit `this` from the enclosing scope.',
-  'prefer-const':
-    'Change let to const — this variable is never reassigned after initialization.',
+  'prefer-const': 'Change let to const — this variable is never reassigned after initialization.',
   'prefer-destructuring':
     'Use destructuring: change `const x = obj.x` to `const { x } = obj` or `const x = arr[0]` to `const [x] = arr`.',
   'prefer-numeric-literals':
@@ -233,10 +229,8 @@ const defaultRuleMessages: Record<string, string> = {
     'Use a named import instead of accessing a named export as a property of the default: change `import foo from "./m"; foo.bar` to `import { bar } from "./m"`.',
   'import/no-mutable-exports':
     'Change the exported `let` or `var` to `const`. If the value must change, export a getter function instead of a mutable binding.',
-  'import/no-amd':
-    'Replace AMD define/require with ES module import/export syntax.',
-  'import/first':
-    'Move all import statements to the top of the file, before any executable code.',
+  'import/no-amd': 'Replace AMD define/require with ES module import/export syntax.',
+  'import/first': 'Move all import statements to the top of the file, before any executable code.',
   'import/no-duplicates':
     'Merge the duplicate imports from this module into a single import statement.',
   'import/extensions':
@@ -261,6 +255,10 @@ const defaultRuleMessages: Record<string, string> = {
     'Simplify the import path by removing unnecessary segments (extra ../, double slashes, trailing /index).',
   'import/no-relative-packages':
     'Import the sibling package by its package name instead of a relative path.',
+
+  // Prettier
+  'prettier/prettier':
+    'Fix the formatting issue. Run the prettier auto-fix (e.g., `npx prettier --write <file>`) rather than fixing by hand.',
 
   // Strict
   strict:

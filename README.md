@@ -2,6 +2,8 @@
 
 Your linter is already talking to your AI — this makes it say the right things.
 
+**This is an experiment.** We think there's something here, but the approach is early and evolving. If you try it, we'd love to hear what works, what doesn't, and what you'd change — [open an issue](https://github.com/jonathannen/eslint-prompter/issues) or reach out.
+
 `eslint-formatter-prompter` is a concrete implementation of the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) approach. It replaces ESLint's default output with structured, directive messages that tell AI _what to fix_ and _why_ — instead of dumping raw lint errors and hoping it figures it out.
 
 ## Why?
@@ -12,7 +14,7 @@ Standard ESLint output assumes a human developer who understands project convent
 
 1. **Adding directive context** to every rule — not just _what_ failed, but _what to do about it_
 2. **Framing output as instructions** — a header tells the AI it MUST fix all violations before proceeding, preventing it from routing around errors
-3. **Grouping by rule** — reducing noise and token waste by clustering related violations together
+3. **Grouping by rule** — the directive message appears once, with all affected files and lines underneath. No repeated messages, minimal tokens
 4. **Being fully customizable** — override any rule message, header, or footer to match your project's conventions
 
 ## Install
@@ -50,7 +52,7 @@ Now every time the AI writes a file, it immediately sees actionable lint feedbac
 
 ## Example output
 
-Given a file with lint errors, the formatter produces:
+Given a file with lint errors, the formatter produces output grouped by rule, with the directive message appearing once:
 
 ```
 The lint tool has found errors. Included in this output is direction on how to resolve these errors. You MUST fix all of the following ESLint violations before proceeding with any other changes. Do not skip any errors. Do not leave any warnings unresolved. Fix every issue listed below.
@@ -71,7 +73,17 @@ After fixing all issues, re-run ESLint to confirm zero violations remain.
 Do not proceed until the linter passes cleanly.
 ```
 
+When linting multiple files, the file path is inlined on each violation line. When linting a single file (the common case with hooks), file paths are omitted to reduce noise.
+
+Scoped rules like `@typescript-eslint/no-unused-vars` automatically fall back to the base rule message (`no-unused-vars`) when no specific message is configured.
+
 Compare that to the default ESLint output and consider which one an AI is more likely to act on correctly.
+
+## Set all rules to error, not warn
+
+We strongly recommend configuring all your ESLint rules as `"error"`, not `"warn"`. Warnings are meant for humans who can exercise judgment — AI treats them as optional. An AI that sees warnings will often deprioritize or skip them entirely, especially under pressure to complete a task. Worse, it may "fix" a warning by adding an eslint-disable comment rather than addressing the underlying issue.
+
+Errors create a hard gate: the linter fails, the AI must fix everything before proceeding. This is the behavior you want. If a rule isn't worth enforcing, remove it. If it is worth enforcing, make it an error.
 
 ## Configuration
 

@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type { ESLint, Linter } from 'eslint';
 import defaultRuleMessages from './rule-messages.js';
 import { loadConfig, type PrompterConfig } from './config.js';
@@ -35,6 +36,28 @@ function severityLabel(severity: number): string {
   return severity === 2 ? 'error' : 'warning';
 }
 
+/**
+ * Look up a rule message, falling back from scoped rules (e.g. @typescript-eslint/no-unused-vars)
+ * to the base rule name (no-unused-vars) if no specific message exists.
+ */
+function getRuleMessage(ruleId: string, ruleMessages: Record<string, string>): string | undefined {
+  if (ruleMessages[ruleId]) {
+    return ruleMessages[ruleId];
+  }
+  // Try base rule name: @scope/plugin/rule-name -> rule-name, @scope/rule-name -> rule-name
+  const slashIndex = ruleId.lastIndexOf('/');
+  if (slashIndex !== -1) {
+    const baseRule = ruleId.slice(slashIndex + 1);
+    return ruleMessages[baseRule];
+  }
+  return undefined;
+}
+
+function relativePath(filePath: string, cwd: string): string {
+  const rel = path.relative(cwd, filePath);
+  return rel || filePath;
+}
+
 export function formatResults(results: ESLint.LintResult[], options: PrompterConfig = {}): string {
   const filesWithIssues = results.filter((r) => r.messages.length > 0);
 
@@ -48,6 +71,8 @@ export function formatResults(results: ESLint.LintResult[], options: PrompterCon
     ...defaultRuleMessages,
     ...options.ruleMessages,
   };
+  const cwd = process.cwd();
+  const multiFile = filesWithIssues.length > 1;
 
   const parts: string[] = [];
 
@@ -59,30 +84,16 @@ export function formatResults(results: ESLint.LintResult[], options: PrompterCon
   const grouped = groupByRule(filesWithIssues);
 
   for (const [ruleId, group] of grouped) {
-    const customMsg = ruleMessages[ruleId];
+    const customMsg = getRuleMessage(ruleId, ruleMessages);
     const ruleLabel = customMsg ? `**${ruleId}**: ${customMsg}` : `**${ruleId}**`;
     parts.push(ruleLabel);
 
-    // Group violations by file within each rule
-    const byFile = new Map<string, Linter.LintMessage[]>();
     for (const v of group.violations) {
-      let msgs = byFile.get(v.filePath);
-      if (!msgs) {
-        msgs = [];
-        byFile.set(v.filePath, msgs);
-      }
-      msgs.push(v.message);
-    }
-
-    for (const [filePath, messages] of byFile) {
-      if (filesWithIssues.length > 1) {
-        parts.push(`  ${filePath}:`);
-      }
-      for (const msg of messages) {
-        parts.push(
-          `- Line ${msg.line}, Col ${msg.column} (${severityLabel(msg.severity)}): ${msg.message}`,
-        );
-      }
+      const msg = v.message;
+      const filePrefix = multiFile ? `${relativePath(v.filePath, cwd)} ` : '';
+      parts.push(
+        `- ${filePrefix}Line ${msg.line}, Col ${msg.column} (${severityLabel(msg.severity)}): ${msg.message}`,
+      );
     }
 
     parts.push('');

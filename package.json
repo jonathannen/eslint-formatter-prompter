@@ -1,6 +1,6 @@
 {
   "name": "eslint-formatter-prompter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ESLint formatter that transforms lint output into AI-friendly prompts",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,8 +31,16 @@
     "prompt",
     "lint"
   ],
-  "author": "",
+  "author": "Jon Williams (https://jonathannen.com)",
   "license": "MIT",
+  "homepage": "https://github.com/jonathannen/eslint-formatter-prompter",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathannen/eslint-formatter-prompter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jonathannen/eslint-formatter-prompter/issues"
+  },
   "type": "module",
   "peerDependencies": {
     "eslint": ">=8.0.0"

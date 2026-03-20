@@ -158,7 +158,7 @@ describe('formatResults', () => {
     );
 
     assert.ok(result.includes('ALWAYS use triple equals'));
-    assert.ok(!result.includes('Use strict equality'));
+    assert.ok(!result.includes('Replace == with ==='));
   });
 
   it('handles unknown rules gracefully', () => {
@@ -178,7 +178,7 @@ describe('formatResults', () => {
     assert.ok(result.includes('Something is wrong'));
   });
 
-  it('handles multiple files grouped by rule', () => {
+  it('inlines file path in violation lines for multi-file results', () => {
     const result = formatResults([
       makeResult('/app/a.js', [
         { ruleId: 'no-var', severity: 2, message: 'Unexpected var.', line: 1, column: 1 },
@@ -194,11 +194,11 @@ describe('formatResults', () => {
       ]),
     ]);
 
-    // Rules should appear as top-level headings, files indented underneath
+    // File path should be inline on the violation line
     assert.ok(result.includes('**no-var**'));
-    assert.ok(result.includes('/app/a.js:'));
     assert.ok(result.includes('**no-console**'));
-    assert.ok(result.includes('/app/b.js:'));
+    assert.ok(result.match(/- .*a\.js.*Line 1/));
+    assert.ok(result.match(/- .*b\.js.*Line 2/));
     assert.ok(result.includes('1 error(s), 1 warning(s) across 2 file(s)'));
   });
 
@@ -212,22 +212,23 @@ describe('formatResults', () => {
       ]),
     ]);
 
-    // no-var should appear only once, with both files listed underneath
+    // no-var should appear only once, with both files inlined on violation lines
     const noVarMatches = result.match(/\*\*no-var\*\*/g);
     assert.equal(noVarMatches?.length, 1);
-    assert.ok(result.includes('/app/a.js:'));
-    assert.ok(result.includes('/app/b.js:'));
+    assert.ok(result.match(/- .*a\.js.*Line 1/));
+    assert.ok(result.match(/- .*b\.js.*Line 3/));
   });
 
-  it('omits file path line for single-file results', () => {
+  it('omits file path for single-file results', () => {
     const result = formatResults([
       makeResult('/app/a.js', [
         { ruleId: 'no-var', severity: 2, message: 'Unexpected var.', line: 1, column: 1 },
       ]),
     ]);
 
-    // Single file should not show indented file paths under rules
-    assert.ok(!result.includes('/app/a.js:'));
+    // Single file should not show file paths on violation lines
+    assert.ok(!result.includes('a.js'));
+    assert.ok(result.includes('- Line 1'));
     assert.ok(result.includes('**no-var**'));
   });
 
@@ -242,5 +243,47 @@ describe('formatResults', () => {
     assert.ok(!result.includes('clean.js'));
     assert.ok(result.includes('**no-var**'));
     assert.ok(result.includes('across 1 file(s)'));
+  });
+
+  it('falls back scoped rules to base rule message', () => {
+    const result = formatResults([
+      makeResult('/app/x.js', [
+        {
+          ruleId: '@typescript-eslint/no-unused-vars',
+          severity: 2,
+          message: "'x' is assigned a value but never used.",
+          line: 5,
+          column: 7,
+        },
+      ]),
+    ]);
+
+    // Should use the no-unused-vars message as fallback
+    assert.ok(result.includes('**@typescript-eslint/no-unused-vars**'));
+    assert.ok(result.includes('Remove the unused variable'));
+  });
+
+  it('prefers specific scoped rule message over fallback', () => {
+    const result = formatResults(
+      [
+        makeResult('/app/x.js', [
+          {
+            ruleId: '@typescript-eslint/no-unused-vars',
+            severity: 2,
+            message: "'x' is assigned a value but never used.",
+            line: 5,
+            column: 7,
+          },
+        ]),
+      ],
+      {
+        ruleMessages: {
+          '@typescript-eslint/no-unused-vars': 'SPECIFIC TS MESSAGE',
+        },
+      },
+    );
+
+    assert.ok(result.includes('SPECIFIC TS MESSAGE'));
+    assert.ok(!result.includes('Remove the unused variable'));
   });
 });
