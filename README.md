@@ -55,16 +55,14 @@ Given a file with lint errors, the formatter produces:
 ```
 The lint tool has found errors. Included in this output is direction on how to resolve these errors. You MUST fix all of the following ESLint violations before proceeding with any other changes. Do not skip any errors. Do not leave any warnings unresolved. Fix every issue listed below.
 
-## /app/src/utils.js
-
-**no-var**: Use let or const instead of var.
+**no-var**: Replace var with const (if never reassigned) or let (if reassigned). Prefer const. Note that var is function-scoped while let/const are block-scoped — verify this does not change behavior in loops or conditionals.
 - Line 1, Col 1 (error): Unexpected var, use let or const instead.
 - Line 5, Col 1 (error): Unexpected var, use let or const instead.
 
-**no-unused-vars**: Remove the unused variable, or prefix it with an underscore if it must remain.
+**no-unused-vars**: Remove the unused variable. If it is a function parameter that must remain for positional reasons, prefix it with an underscore (_). Do not add an eslint-disable comment or fake usage.
 - Line 3, Col 7 (error): 'temp' is defined but never used.
 
-**eqeqeq**: Use strict equality (=== or !==) instead of loose equality (== or !=).
+**eqeqeq**: Replace == with === and != with !==. If comparing against null to catch both null and undefined, check whether the project config allows `== null` before changing it.
 - Line 8, Col 10 (error): Expected '===' and instead saw '=='.
 
 **Summary**: 4 error(s), 0 warning(s) across 1 file(s).
@@ -96,16 +94,20 @@ Create a `.eslint-formatter-prompter.json` in your project root:
 | `footer`       | `string \| null`         | Message shown after violations. Set to `null` to disable.                    |
 | `ruleMessages` | `Record<string, string>` | Per-rule AI instructions. Merged with (and overrides) the built-in defaults. |
 
-The built-in defaults cover ~100 rules from the Airbnb base config. Any rule without a custom message still shows the original ESLint message — nothing is lost.
+The built-in defaults cover ~100 common rules with directive messages that prevent typical AI mistakes (e.g., telling the AI _not_ to add eslint-disable comments, or warning about scoping differences when replacing `var`). Any rule without a custom message still shows the original ESLint message — nothing is lost.
 
-### Writing good rule messages
+### Custom messages are where the real power is
 
-Following the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) philosophy, the best rule messages:
+The built-in messages are a solid starting point, but they are generic by definition. The real payoff comes from **project-specific custom messages** that encode _your_ conventions, _your_ preferred patterns, and _your_ architecture.
 
-- **Explain what to do**, not just what's wrong — `"Use the db.query() wrapper from @app/db"` beats `"Avoid direct database queries"`.
-- **Point to examples** — `"see src/modules/users/queries.ts for the pattern"` gives the AI a gold template to follow.
-- **State the why** — `"Direct queries bypass audit logging"` prevents the AI from finding a clever workaround that still violates the intent.
-- **Be clear on the ask** - "You must fix this in this manner" gives the AI clear direction on how to solve the issue.
+A built-in message can say "Remove the console statement." A custom message can say "Remove console statements. Use the logger from @app/logging instead — see src/lib/logger.ts for usage." The difference is the AI knowing exactly what to replace it with, not just what to remove.
+
+Following the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) philosophy, the best custom messages:
+
+- **Point to your code** — `"Use the db.query() wrapper from @app/db — see src/modules/users/queries.ts for the pattern"` gives the AI a gold template to follow.
+- **State your why** — `"Direct queries bypass audit logging"` prevents the AI from finding a clever workaround that still violates the intent.
+- **Name the replacement** — `"Use @app/logging instead"` is better than `"Use a proper logging utility"`. Be specific.
+- **Be directive** — `"You must use the Result type from @app/types for all error handling"` gives the AI clear, unambiguous direction.
 
 ## Future
 

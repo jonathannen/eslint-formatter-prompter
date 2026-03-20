@@ -6,18 +6,27 @@ const DEFAULT_HEADER = `The lint tool has found errors. Included in this output 
 
 const DEFAULT_FOOTER = `After fixing all issues, re-run ESLint to confirm zero violations remain. Do not proceed until the linter passes cleanly.`;
 
-interface GroupedMessages {
-  [ruleId: string]: Linter.LintMessage[];
+interface FileViolation {
+  filePath: string;
+  message: Linter.LintMessage;
 }
 
-function groupByRule(messages: Linter.LintMessage[]): GroupedMessages {
-  const groups: GroupedMessages = {};
-  for (const msg of messages) {
-    const ruleId = msg.ruleId ?? 'unknown';
-    if (!groups[ruleId]) {
-      groups[ruleId] = [];
+interface RuleGroup {
+  violations: FileViolation[];
+}
+
+function groupByRule(results: ESLint.LintResult[]): Map<string, RuleGroup> {
+  const groups = new Map<string, RuleGroup>();
+  for (const result of results) {
+    for (const msg of result.messages) {
+      const ruleId = msg.ruleId ?? 'unknown';
+      let group = groups.get(ruleId);
+      if (!group) {
+        group = { violations: [] };
+        groups.set(ruleId, group);
+      }
+      group.violations.push({ filePath: result.filePath, message: msg });
     }
-    groups[ruleId].push(msg);
   }
   return groups;
 }
@@ -47,26 +56,36 @@ export function formatResults(results: ESLint.LintResult[], options: PrompterCon
     parts.push('');
   }
 
-  for (const result of filesWithIssues) {
-    parts.push(`## ${result.filePath}`);
-    parts.push('');
+  const grouped = groupByRule(filesWithIssues);
 
-    const grouped = groupByRule(result.messages);
+  for (const [ruleId, group] of grouped) {
+    const customMsg = ruleMessages[ruleId];
+    const ruleLabel = customMsg ? `**${ruleId}**: ${customMsg}` : `**${ruleId}**`;
+    parts.push(ruleLabel);
 
-    for (const [ruleId, messages] of Object.entries(grouped)) {
-      const customMsg = ruleMessages[ruleId];
-      const ruleLabel = customMsg ? `**${ruleId}**: ${customMsg}` : `**${ruleId}**`;
+    // Group violations by file within each rule
+    const byFile = new Map<string, Linter.LintMessage[]>();
+    for (const v of group.violations) {
+      let msgs = byFile.get(v.filePath);
+      if (!msgs) {
+        msgs = [];
+        byFile.set(v.filePath, msgs);
+      }
+      msgs.push(v.message);
+    }
 
-      parts.push(ruleLabel);
-
+    for (const [filePath, messages] of byFile) {
+      if (filesWithIssues.length > 1) {
+        parts.push(`  ${filePath}:`);
+      }
       for (const msg of messages) {
         parts.push(
           `- Line ${msg.line}, Col ${msg.column} (${severityLabel(msg.severity)}): ${msg.message}`,
         );
       }
-
-      parts.push('');
     }
+
+    parts.push('');
   }
 
   let errorCount = 0;
