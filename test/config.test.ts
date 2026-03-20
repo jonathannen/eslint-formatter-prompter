@@ -12,9 +12,9 @@ describe('loadConfig', () => {
     assert.deepEqual(config, {});
   });
 
-  it('loads .eslint-prompter.json', () => {
+  it('loads .eslint-formatter-prompter.json', () => {
     const dir = mkdtempSync(join(tmpdir(), 'eslint-prompter-'));
-    const configPath = join(dir, '.eslint-prompter.json');
+    const configPath = join(dir, '.eslint-formatter-prompter.json');
     const expected = {
       header: 'Custom header',
       footer: 'Custom footer',
@@ -28,9 +28,9 @@ describe('loadConfig', () => {
     unlinkSync(configPath);
   });
 
-  it('loads .eslint-prompterrc.json', () => {
+  it('loads .eslint-formatter-prompterrc.json', () => {
     const dir = mkdtempSync(join(tmpdir(), 'eslint-prompter-'));
-    const configPath = join(dir, '.eslint-prompterrc.json');
+    const configPath = join(dir, '.eslint-formatter-prompterrc.json');
     writeFileSync(configPath, JSON.stringify({ header: 'RC header' }));
 
     const config = loadConfig(dir);

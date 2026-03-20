@@ -1,4 +1,4 @@
-# eslint-prompter
+# eslint-formatter-prompter
 
 An ESLint formatter that transforms lint output into AI-friendly prompts. Rather than dumping raw lint errors and expecting an AI to figure out what to do, this formatter tells it *why* a rule matters and *what to fix* — for every violation.
 
@@ -8,7 +8,7 @@ Based on the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prom
 
 Standard ESLint output assumes a human developer who understands project conventions. When AI reads `'x' is defined but never used  no-unused-vars`, it might remove the variable, comment out the line, or add an eslint-disable — all technically valid, none necessarily correct.
 
-`eslint-prompter` solves this by:
+`eslint-formatter-prompter` solves this by:
 
 1. **Adding directive context** to every rule — not just *what* failed, but *what to do about it*
 2. **Framing output as instructions** — a header tells the AI it MUST fix all violations before proceeding, preventing it from routing around errors
@@ -18,15 +18,15 @@ Standard ESLint output assumes a human developer who understands project convent
 ## Install
 
 ```bash
-pnpm add --save-dev eslint-prompter
+pnpm add --save-dev eslint-formatter-prompter
 ```
 
 ## Usage
 
-Use it like any ESLint formatter:
+ESLint resolves `eslint-formatter-` prefixed packages automatically, so you just use `prompter`:
 
 ```bash
-eslint --format eslint-prompter .
+eslint --format prompter .
 ```
 
 ### With Claude Code hooks
@@ -39,7 +39,7 @@ The real power comes from running this automatically. Use a [Claude Code PostToo
     "PostToolUse": [
       {
         "matcher": "Write|Edit",
-        "command": "eslint --format eslint-prompter ${file_path}"
+        "command": "eslint --format prompter ${file_path}"
       }
     ]
   }
@@ -79,7 +79,7 @@ Compare that to the default ESLint output and consider which one an AI is more l
 
 ## Configuration
 
-Create a `.eslint-prompter.json` in your project root:
+Create a `.eslint-formatter-prompter.json` in your project root:
 
 ```json
 {
@@ -111,7 +111,7 @@ Following the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-pro
 ## Programmatic API
 
 ```typescript
-import { formatResults, defaultRuleMessages } from 'eslint-prompter';
+import { formatResults, defaultRuleMessages } from 'eslint-formatter-prompter';
 
 const output = formatResults(eslintResults, {
   header: 'Custom header',

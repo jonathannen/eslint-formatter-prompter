@@ -1,5 +1,5 @@
 {
-  "name": "eslint-prompter",
+  "name": "eslint-formatter-prompter",
   "version": "0.1.0",
   "description": "ESLint formatter that transforms lint output into AI-friendly prompts",
   "main": "dist/index.js",

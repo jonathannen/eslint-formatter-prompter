@@ -7,7 +7,7 @@ export interface PrompterConfig {
   ruleMessages?: Record<string, string>;
 }
 
-const CONFIG_FILENAMES = ['.eslint-prompter.json', '.eslint-prompterrc', '.eslint-prompterrc.json'];
+const CONFIG_FILENAMES = ['.eslint-formatter-prompter.json', '.eslint-formatter-prompterrc', '.eslint-formatter-prompterrc.json'];
 
 export function loadConfig(cwd: string = process.cwd()): PrompterConfig {
   for (const filename of CONFIG_FILENAMES) {
