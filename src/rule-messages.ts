@@ -1,182 +1,270 @@
 /**
  * Default AI-friendly messages for common ESLint rules (Airbnb base).
- * Each message explains what the AI should do to fix the violation.
+ * Each message tells the AI exactly what to do and what NOT to do,
+ * preventing common incorrect fixes.
  */
 const defaultRuleMessages: Record<string, string> = {
   // Possible Errors
-  'no-console': 'Remove console statements. Use a proper logging utility if logging is needed.',
-  'no-debugger': 'Remove the debugger statement.',
-  'no-dupe-args': 'Remove the duplicate argument name in the function definition.',
-  'no-dupe-keys': 'Remove the duplicate key in the object literal.',
-  'no-duplicate-case': 'Remove the duplicate case label in the switch statement.',
-  'no-empty': 'Remove the empty block statement or add a comment explaining why it is empty.',
-  'no-extra-semi': 'Remove the unnecessary semicolon.',
-  'no-unreachable': 'Remove the unreachable code after return, throw, continue, or break.',
+  'no-console':
+    'Remove the console statement entirely. Do not comment it out or wrap it in a condition.',
+  'no-debugger': 'Remove the debugger statement entirely. Do not replace it with console.log.',
+  'no-dupe-args':
+    'Rename the duplicate parameter to a unique, meaningful name. The last duplicate shadows earlier ones — determine which the function body intended to use.',
+  'no-dupe-keys':
+    'Remove or rename the duplicate object key. The last duplicate silently overwrites earlier ones — determine which value was intended and keep only that one.',
+  'no-duplicate-case':
+    'Fix the duplicate case value. This is likely a copy-paste error — the duplicate case body probably belongs under a different value. Do not just delete the case block.',
+  'no-empty':
+    'Add a descriptive comment inside the empty block explaining why it is intentionally empty (e.g., // intentional no-op). Do not add placeholder code.',
+  'no-extra-semi': 'Remove the redundant semicolon.',
+  'no-unreachable':
+    'Remove the unreachable code after the return/throw/break/continue, or move it above the exit statement if it was meant to execute.',
   'no-unsafe-negation':
-    'Fix the unsafe negation. Use parentheses to clarify the intended operation.',
+    'Wrap the relational expression in parentheses: change `!key in obj` to `!(key in obj)` or `!a instanceof B` to `!(a instanceof B)`. Almost always the intent is to negate the result, not the left operand.',
   'valid-typeof':
-    'Fix the typeof comparison to use a valid string: "undefined", "object", "boolean", "number", "string", "function", "symbol", or "bigint".',
+    'Fix the typeof comparison string. Valid values are: "undefined", "object", "boolean", "number", "string", "function", "symbol", "bigint". This is likely a typo — correct the string to the intended type.',
 
   // Best Practices
-  curly: 'Add curly braces to the control statement body.',
-  'default-case': 'Add a default case to the switch statement.',
-  'dot-notation': 'Use dot notation instead of bracket notation to access the property.',
-  eqeqeq: 'Use strict equality (=== or !==) instead of loose equality (== or !=).',
+  curly: 'Add curly braces around the control statement body, even for single statements.',
+  'default-case':
+    'Add a default case to the switch statement. If omission is intentional, add a `// no default` comment as the last item in the switch body.',
+  'dot-notation':
+    'Replace bracket notation with dot notation: change `obj["prop"]` to `obj.prop`. Only use brackets for dynamic keys or property names with special characters.',
+  eqeqeq:
+    'Replace == with === and != with !==. If comparing against null to catch both null and undefined, check whether the project config allows `== null` before changing it.',
   'guard-for-in':
-    'Add an if statement to filter unwanted properties from the prototype chain in the for-in loop.',
-  'no-alert': 'Remove the alert/confirm/prompt call. Use a proper UI notification system.',
+    'Add a hasOwn check inside the for-in loop: `if (Object.hasOwn(obj, key))`, or replace the for-in loop with Object.keys(obj).forEach() or Object.entries().',
+  'no-alert':
+    'Remove the alert/confirm/prompt call. These are browser-native dialogs not suitable for production.',
   'no-caller':
-    'Remove the use of arguments.caller or arguments.callee. Refactor to use named functions.',
-  'no-else-return': 'Remove the else clause since the if block contains a return statement.',
-  'no-empty-function': 'Remove the empty function or add a comment explaining why it is empty.',
-  'no-eval': 'Remove the eval() call. Find a safer alternative.',
-  'no-extend-native': 'Do not extend native objects. Create a utility function instead.',
-  'no-extra-bind': 'Remove the unnecessary .bind() call.',
-  'no-fallthrough': 'Add a break statement or a "falls through" comment to the switch case.',
-  'no-global-assign': 'Do not reassign global variables. Use a local variable instead.',
+    'Replace arguments.callee with a named function reference. Give the function a name and call it directly for recursion.',
+  'no-else-return':
+    'Remove the else wrapper since the if block already returns. Keep the code that was inside the else — just un-indent it.',
+  'no-empty-function':
+    'Add a comment inside the empty function explaining why it is intentionally empty (e.g., // no-op callback). Do not add placeholder code.',
+  'no-eval':
+    'Remove the eval() call. Use bracket notation for dynamic property access, JSON.parse() for data parsing, or refactor to avoid runtime code evaluation.',
+  'no-extend-native':
+    'Do not modify native prototypes (Array.prototype, Object.prototype, etc.). Create a standalone utility function instead.',
+  'no-extra-bind':
+    'Remove the .bind() call — this function does not reference `this`, so the binding has no effect.',
+  'no-fallthrough':
+    'Add a break statement at the end of the case. If fallthrough is intentional, add a `// falls through` comment instead of a break.',
+  'no-global-assign': 'Do not reassign global variables like Object, undefined, or window. Use a local variable with a different name.',
   'no-implied-eval':
-    'Do not use string arguments with setTimeout/setInterval. Pass a function instead.',
-  'no-iterator': 'Do not use the __iterator__ property. Use ES6 iterators and generators.',
-  'no-labels': 'Remove the label. Refactor the code to avoid using labeled statements.',
-  'no-lone-blocks': 'Remove the unnecessary block statement.',
+    'Pass a function to setTimeout/setInterval instead of a string. Change `setTimeout("code", delay)` to `setTimeout(() => { code }, delay)`.',
+  'no-iterator':
+    'Replace __iterator__ with the standard Symbol.iterator protocol. Use `[Symbol.iterator]()` method instead.',
+  'no-labels':
+    'Remove the label and refactor the control flow. Extract inner logic into a function or use a boolean flag instead of labeled break/continue.',
+  'no-lone-blocks':
+    'Remove the unnecessary wrapping braces. Keep the inner statements — only the block wrapper is redundant.',
   'no-loop-func':
-    'Do not create functions within loops. Extract the function outside the loop or use a closure.',
-  'no-multi-spaces': 'Remove the multiple spaces. Use single spaces.',
-  'no-multi-str': 'Do not use multiline strings with backslash. Use template literals instead.',
-  'no-new': 'Do not use the new keyword for side effects. Assign the result to a variable.',
-  'no-new-func': 'Do not use the Function constructor. Declare the function directly.',
+    'This function inside a loop captures a variable that changes each iteration, causing a closure bug. Fix by changing `var` to `let` in the loop, or move the function outside the loop.',
+  'no-multi-spaces': 'Replace multiple consecutive spaces with a single space.',
+  'no-multi-str':
+    'Replace the backslash-newline multiline string with a template literal or string concatenation.',
+  'no-new':
+    'Assign the constructor result to a variable: `const x = new Thing()`. Do not use `new` purely for side effects.',
+  'no-new-func':
+    'Replace `new Function(...)` with a standard function declaration or arrow function. Do not construct functions from strings.',
   'no-new-wrappers':
-    'Do not use primitive wrapper constructors (new String, new Number, new Boolean). Use the literal form.',
-  'no-octal': 'Do not use octal literals. Use the 0o prefix for octal numbers.',
+    'Remove `new` from the primitive wrapper. Use `String(val)`, `Number(val)`, or `Boolean(val)` without `new` for type conversion. `new String()` creates an object, not a primitive.',
+  'no-octal':
+    'Replace the legacy octal literal (leading zero, e.g., 071) with the decimal equivalent or ES6 octal syntax (0o71).',
   'no-octal-escape':
-    'Do not use octal escape sequences. Use Unicode escape sequences or template literals.',
-  'no-param-reassign': 'Do not reassign function parameters. Create a new variable instead.',
-  'no-proto': 'Do not use __proto__. Use Object.getPrototypeOf() instead.',
+    'Replace the octal escape sequence with a Unicode escape (\\u00XX) or hex escape (\\xXX).',
+  'no-param-reassign':
+    'Do not reassign function parameters. Create a new local variable: `const result = param + 1` instead of `param = param + 1`.',
+  'no-proto':
+    'Replace __proto__ with Object.getPrototypeOf() for reading or Object.setPrototypeOf() for writing.',
   'no-redeclare':
-    'Do not redeclare variables. Use a different name or remove the duplicate declaration.',
+    'Remove the duplicate var declaration. Either just reassign the variable (drop the `var` keyword) or use let/const which prevents redeclaration entirely.',
   'no-return-assign':
-    'Do not use assignment in the return statement. Separate the assignment from the return.',
+    'Separate the assignment from the return statement. Put the assignment on its own line, then return the variable. If === was intended instead of =, fix the operator.',
   'no-return-await':
-    'Remove the unnecessary await before return. The async function already wraps the value in a promise.',
-  'no-script-url': 'Do not use javascript: URLs. Use event handlers instead.',
-  'no-self-assign': 'Remove the self-assignment as it has no effect.',
-  'no-self-compare': 'Remove the self-comparison. If checking for NaN, use Number.isNaN().',
+    'Remove the redundant `await` before return — the async function already wraps the value in a Promise. Exception: keep `await` if inside a try block where you need to catch rejections.',
+  'no-script-url':
+    'Replace the javascript: URL with an event handler. Use addEventListener() or onClick, not `href="javascript:..."`.',
+  'no-self-assign':
+    'Remove the self-assignment (x = x) — it has no effect. This is likely a typo; check if a different variable was intended on one side.',
+  'no-self-compare':
+    'Fix the self-comparison (x === x). If checking for NaN, use Number.isNaN(x) instead. Otherwise, this is likely a typo — use the intended variable.',
   'no-sequences':
-    'Do not use the comma operator. Separate the expressions into individual statements.',
-  'no-throw-literal': 'Throw an Error object instead of a literal value.',
-  'no-unused-expressions': 'Remove the unused expression or convert it to a proper statement.',
-  'no-useless-catch': 'Remove the useless catch clause that only rethrows the error.',
-  'no-useless-concat': 'Remove the useless string concatenation. Combine the strings into one.',
-  'no-useless-escape': 'Remove the unnecessary escape character.',
-  'no-useless-return': 'Remove the unnecessary return statement.',
-  'no-void': 'Do not use the void operator.',
-  'no-with': 'Do not use the with statement. Use local variables instead.',
+    'Split the comma-operator expression into separate statements. The comma operator evaluates both expressions but only returns the last value, which is error-prone.',
+  'no-throw-literal':
+    'Throw an Error object: `throw new Error("message")` instead of throwing a string, number, or other literal. Error objects provide stack traces.',
+  'no-unused-expressions':
+    'This expression produces a value that is never used. Either assign the result to a variable, call it as a function for its side effect, or remove it.',
+  'no-useless-catch':
+    'Remove the try/catch — the catch block only rethrows the same error with no added handling. Keep the finally block if one exists.',
+  'no-useless-concat':
+    'Merge the adjacent string literals into a single string. "a" + "b" should just be "ab".',
+  'no-useless-escape':
+    'Remove the unnecessary backslash — this character does not need escaping in this context.',
+  'no-useless-return':
+    'Remove the trailing return statement — the function ends here naturally without it.',
+  'no-void': 'Remove the void operator. Use `undefined` directly if needed.',
+  'no-with':
+    'Replace the with statement with explicit property access or destructuring: `const { x, y } = obj` instead of `with (obj)`.',
   'prefer-promise-reject-errors':
-    'Pass an Error object to Promise.reject() instead of a non-Error value.',
-  radix: 'Add the radix parameter (usually 10) to parseInt().',
-  'vars-on-top': 'Move variable declarations to the top of their scope.',
-  'wrap-iife': 'Wrap the immediately invoked function expression (IIFE) properly.',
-  yoda: 'Reverse the Yoda condition to use natural comparison order (variable first, then literal).',
+    'Reject with an Error object: `Promise.reject(new Error("message"))` instead of a string or other value. Error objects provide stack traces.',
+  radix: 'Add the radix parameter to parseInt(): `parseInt(value, 10)` for decimal parsing.',
+  'vars-on-top':
+    'Move the var declaration to the top of the function scope. Better yet, convert to let/const with block scoping.',
+  'wrap-iife':
+    'Wrap the immediately-invoked function expression in parentheses: `(function() { ... }())`.',
+  yoda:
+    'Reverse the comparison to natural order — put the variable first: change `"red" === color` to `color === "red"`. Flip the operator for inequalities.',
 
   // Variables
-  'no-delete-var': 'Do not use delete on variables. Delete is only for object properties.',
-  'no-shadow': 'Rename the variable to avoid shadowing the outer scope variable.',
-  'no-shadow-restricted-names': 'Do not shadow restricted names (undefined, NaN, Infinity, etc.).',
-  'no-undef': 'The variable is not defined. Either declare it, import it, or add a global comment.',
-  'no-undef-init': 'Remove the explicit initialization to undefined.',
+  'no-delete-var':
+    'Remove the delete statement — delete is for object properties, not variables. Let the variable go out of scope or set it to null.',
+  'no-shadow':
+    'Rename the inner variable to avoid shadowing the outer scope variable of the same name. Choose a more specific name that reflects its purpose in this scope.',
+  'no-shadow-restricted-names':
+    'Rename this identifier — it shadows a JavaScript built-in (undefined, NaN, Infinity, etc.). Using these names as variables causes subtle bugs.',
+  'no-undef':
+    'This variable is not defined. Add the missing import or declaration. Do not add a dummy declaration — find where this value actually comes from.',
+  'no-undef-init':
+    'Remove `= undefined` from the declaration — variables are undefined by default. Just use `let x;` instead of `let x = undefined;`.',
   'no-unused-vars':
-    'Remove the unused variable, or prefix it with an underscore if it must remain.',
-  'no-use-before-define': 'Move the declaration before its first usage, or reorder the code.',
+    'Remove the unused variable. If it is a function parameter that must remain for positional reasons, prefix it with an underscore (_). Do not add an eslint-disable comment or fake usage.',
+  'no-use-before-define':
+    'Move the declaration above its first usage. Do not change the declaration — reorder the code so definitions come before references.',
 
   // Stylistic
-  camelcase: 'Rename the identifier to use camelCase.',
-  'func-names': 'Add a name to the function expression.',
+  camelcase:
+    'Rename the identifier to camelCase: e.g., my_var becomes myVar. For destructured properties from external APIs, rename inline: `const { snake_case: camelCase } = obj`.',
+  'func-names':
+    'Add a name to the function expression: `const x = function myFunc() {}`. Do not convert to an arrow function — that changes `this` binding.',
   'new-cap':
-    'Constructors must start with an uppercase letter. Non-constructors must start with a lowercase letter.',
-  'no-array-constructor': 'Use array literal notation [] instead of the Array constructor.',
+    'Constructors must be capitalized: `new Person()`, not `new person()`. Non-constructor functions must be lowercase. If this is not a constructor, remove `new`.',
+  'no-array-constructor':
+    'Use array literal syntax: `[1, 2, 3]` instead of `Array(1, 2, 3)`. Note: `new Array(n)` with a single number argument creates a sparse array and is allowed.',
   'no-bitwise':
-    'Do not use bitwise operators. If intentional, add an eslint-disable comment with justification.',
-  'no-continue': 'Refactor to avoid using the continue statement.',
-  'no-lonely-if': 'Combine the lonely if statement with the outer else into an else-if.',
-  'no-mixed-operators': 'Add parentheses to clarify the order of operations.',
-  'no-multi-assign': 'Do not chain assignments. Split into separate assignment statements.',
+    'Replace the bitwise operator with the likely intended logical operator: `|` should probably be `||`, `&` should probably be `&&`. If bitwise is intentional, add an eslint-disable comment with justification.',
+  'no-continue':
+    'Replace the continue statement by inverting the condition: change `if (x) { continue; } doStuff();` to `if (!x) { doStuff(); }`.',
+  'no-lonely-if':
+    'Convert the lonely if inside else to an else-if: change `else { if (cond) {} }` to `else if (cond) {}`.',
+  'no-mixed-operators':
+    'Add parentheses to clarify operator precedence. Do not change the operators or logic — just make the grouping explicit.',
+  'no-multi-assign':
+    'Split the chained assignment into separate statements. `a = b = c = 5` should become three separate assignments, each with its own declaration if needed.',
   'no-nested-ternary':
-    'Replace the nested ternary with an if-else statement or extract to a function.',
-  'no-new-object': 'Use object literal notation {} instead of the Object constructor.',
-  'no-plusplus': 'Use += 1 or -= 1 instead of ++ or -- operators.',
+    'Replace the nested ternary with if/else statements or extract the inner ternary into a named variable. Do not just add parentheses — the nesting must be eliminated.',
+  'no-new-object':
+    'Use object literal syntax: `{}` instead of `new Object()`.',
+  'no-plusplus':
+    'Replace ++ with += 1 and -- with -= 1.',
   'no-restricted-syntax':
-    'This syntax is restricted by the project configuration. Refactor to use an allowed alternative.',
-  'no-underscore-dangle': 'Remove the dangling underscore from the identifier name.',
-  'no-unneeded-ternary': 'Simplify the unnecessary ternary expression.',
-  'one-var': 'Use one variable declaration per line.',
+    'This syntax is restricted by the project ESLint config. Check the rule configuration for the required alternative and follow its custom message.',
+  'no-underscore-dangle':
+    'Remove the leading/trailing underscore from the identifier. For private class members, use ES2022 private fields (#field) instead.',
+  'no-unneeded-ternary':
+    'Simplify the ternary. `x ? true : false` should be just `x`. `x ? false : true` should be `!x`. `x ? x : fallback` should be `x || fallback`.',
+  'one-var': 'Use one variable declaration per statement: `let a; let b;` instead of `let a, b;`.',
   'operator-assignment':
-    'Use the shorthand operator assignment (e.g., x += 1 instead of x = x + 1).',
-  'prefer-object-spread': 'Use the object spread syntax {...obj} instead of Object.assign().',
-  'spaced-comment': 'Add a space after the comment marker (//, /*, etc.).',
+    'Use the shorthand operator: change `x = x + y` to `x += y`.',
+  'prefer-object-spread':
+    'Replace Object.assign({}, obj) with spread syntax: `{ ...obj }`. Only applies when the first argument is an object literal.',
+  'spaced-comment': 'Add a space after the comment marker: `// comment` not `//comment`.',
 
   // ES6
-  'arrow-body-style': 'Simplify the arrow function body. Use a concise body when possible.',
-  'constructor-super': 'Add a super() call in the constructor of the derived class.',
-  'no-class-assign': 'Do not reassign the class declaration.',
-  'no-const-assign': 'Do not reassign a const variable. Use let if reassignment is needed.',
-  'no-dupe-class-members': 'Remove the duplicate class member.',
-  'no-duplicate-imports': 'Combine the duplicate import statements into a single import.',
-  'no-new-symbol': 'Do not use new with Symbol. Call Symbol() as a function.',
-  'no-this-before-super': 'Do not use this/super before calling super() in the constructor.',
+  'arrow-body-style':
+    'Remove the braces and return keyword from the arrow function: change `() => { return x; }` to `() => x`. For object literals, wrap in parentheses: `() => ({ key: value })`.',
+  'constructor-super':
+    'Add a super() call in the derived class constructor before any `this` usage. If this is not a derived class, remove the super() call.',
+  'no-class-assign': 'Do not reassign the class name. Use a different variable name.',
+  'no-const-assign':
+    'This variable is declared with const but is being reassigned. Change const to let if reassignment is needed. Do not change const to let if only properties are being mutated — `const obj = {}; obj.key = 1;` is valid.',
+  'no-dupe-class-members':
+    'Remove or rename the duplicate class member. The last duplicate silently overwrites earlier ones — determine which implementation was intended.',
+  'no-duplicate-imports':
+    'Merge the duplicate import statements into a single import: `import defaultExport, { named } from "module"`.',
+  'no-new-symbol':
+    'Remove `new` — Symbol is not a constructor. Call it as a function: `Symbol("description")`.',
+  'no-this-before-super':
+    'Move super() above the `this` reference in the constructor. Do not remove the `this` usage — reorder so super() comes first.',
   'no-useless-computed-key':
-    'Remove the unnecessary computed property key. Use a static key instead.',
+    'Remove the unnecessary brackets from the computed property key: change `{["name"]: value}` to `{name: value}`.',
   'no-useless-constructor':
-    'Remove the unnecessary constructor. The class will use the default constructor.',
+    'Remove the empty constructor — ES2015 provides an equivalent default constructor automatically.',
   'no-useless-rename':
-    'Remove the useless rename. The import/export/destructuring name is the same.',
-  'no-var': 'Use let or const instead of var. Prefer const over let.',
-  'object-shorthand': 'Use the shorthand method/property syntax in the object literal.',
+    'Remove the redundant rename: change `import { foo as foo }` to `import { foo }`.',
+  'no-var':
+    'Replace var with const (if never reassigned) or let (if reassigned). Prefer const. Note that var is function-scoped while let/const are block-scoped — verify this does not change behavior in loops or conditionals.',
+  'object-shorthand':
+    'Use shorthand syntax: change `{x: x}` to `{x}` and `{method: function() {}}` to `{method() {}}`. Do not convert arrow function values — they have different `this` binding.',
   'prefer-arrow-callback':
-    'Use an arrow function instead of a function expression for the callback.',
-  'prefer-const': 'Use const instead of let since this variable is never reassigned.',
-  'prefer-destructuring': 'Use destructuring to extract the value.',
+    'Convert the callback to an arrow function. Do not convert if the callback uses its own `this` binding — arrow functions inherit `this` from the enclosing scope.',
+  'prefer-const':
+    'Change let to const — this variable is never reassigned after initialization.',
+  'prefer-destructuring':
+    'Use destructuring: change `const x = obj.x` to `const { x } = obj` or `const x = arr[0]` to `const [x] = arr`.',
   'prefer-numeric-literals':
-    'Use numeric literal syntax (0b, 0o, 0x) instead of parseInt() for binary, octal, and hexadecimal.',
-  'prefer-rest-params': 'Use rest parameters (...args) instead of the arguments object.',
-  'prefer-spread': 'Use the spread operator instead of .apply().',
-  'prefer-template': 'Use template literals instead of string concatenation.',
-  'require-yield': 'Add a yield expression in the generator function.',
-  'symbol-description': 'Add a description string to the Symbol() call.',
+    'Use a numeric literal instead of parseInt: change `parseInt("1A", 16)` to `0x1A`, `parseInt("71", 8)` to `0o71`, `parseInt("11", 2)` to `0b11`.',
+  'prefer-rest-params':
+    'Replace the arguments object with rest parameters: change `function f() { use(arguments) }` to `function f(...args) { use(args) }`.',
+  'prefer-spread':
+    'Replace .apply() with spread syntax: change `fn.apply(null, args)` to `fn(...args)`. Only safe when the .apply() context is null, undefined, or the same object.',
+  'prefer-template':
+    'Replace string concatenation with a template literal: change `"Hello " + name` to `` `Hello ${name}` ``.',
+  'require-yield':
+    'Add a yield expression to the generator function, or convert it to a regular function if generator behavior is not needed.',
+  'symbol-description':
+    'Add a descriptive string argument to Symbol(): `Symbol("mySymbol")`. This aids debugging.',
 
   // Import plugin
   'import/no-unresolved':
-    'Fix the import path. The module cannot be resolved. Check the path and ensure the dependency is installed.',
-  'import/named': 'Fix the named import. The exported name does not exist in the target module.',
-  'import/default': 'Fix the default import. The target module has no default export.',
+    'Fix the import path — the module cannot be resolved. Check for typos, verify the file exists, and ensure the dependency is installed. Do not create a stub file to silence this.',
+  'import/named':
+    'Fix the named import — this export does not exist in the source module. Check what the module actually exports and use the correct name.',
+  'import/default':
+    'The imported module has no default export. Switch to a named import: `import { name } from "module"`, or add a default export to the source module if appropriate.',
   'import/namespace':
-    'Fix the namespace import. The dereferenced property does not exist in the imported module.',
-  'import/export': 'Fix the duplicate or conflicting export.',
+    'The accessed property does not exist on the namespace import. Check what the module actually exports and use a valid export name.',
+  'import/export':
+    'Remove the duplicate export. This module exports the same name twice — keep only the intended one.',
   'import/no-named-as-default':
-    'Do not import a named export as the default. Use the named import syntax.',
+    'You are importing the default export with a name that matches a named export. You likely want a named import: change `import bar from "./foo"` to `import { bar } from "./foo"`.',
   'import/no-named-as-default-member':
-    'Do not access a named export as a property of the default export. Import it directly.',
+    'Use a named import instead of accessing a named export as a property of the default: change `import foo from "./m"; foo.bar` to `import { bar } from "./m"`.',
   'import/no-mutable-exports':
-    'Do not export mutable bindings (let/var). Use const or export a function.',
-  'import/no-amd': 'Do not use AMD require/define. Use ES module import/export.',
-  'import/first': 'Move all imports to the top of the file, before any other statements.',
-  'import/no-duplicates': 'Merge the duplicate import statements for this module.',
-  'import/extensions': 'Fix the file extension in the import path per project configuration.',
-  'import/order': 'Reorder the imports to match the configured import ordering.',
-  'import/newline-after-import': 'Add a blank line after the import statements.',
+    'Change the exported `let` or `var` to `const`. If the value must change, export a getter function instead of a mutable binding.',
+  'import/no-amd':
+    'Replace AMD define/require with ES module import/export syntax.',
+  'import/first':
+    'Move all import statements to the top of the file, before any executable code.',
+  'import/no-duplicates':
+    'Merge the duplicate imports from this module into a single import statement.',
+  'import/extensions':
+    'Fix the file extension in the import path to match the project ESLint config (add or remove the extension as required).',
+  'import/order':
+    'Reorder the imports to match the configured group order (typically: builtins, external packages, internal, parent, sibling, index).',
+  'import/newline-after-import':
+    'Add a blank line after the last import statement, before any other code.',
   'import/prefer-default-export':
-    'Use a default export since this module only has a single named export.',
-  'import/no-absolute-path': 'Do not use absolute paths in imports. Use relative paths.',
-  'import/no-dynamic-require': 'Do not use dynamic require(). Use static imports.',
-  'import/no-webpack-loader-syntax': 'Do not use webpack loader syntax in imports.',
-  'import/no-self-import': 'Remove the self-import. A module must not import itself.',
-  'import/no-cycle': 'Break the circular dependency between these modules.',
+    'This module has a single named export. Convert it to a default export, or add additional exports if more are planned.',
+  'import/no-absolute-path':
+    'Replace the absolute import path with a relative path or package alias.',
+  'import/no-dynamic-require':
+    'Replace the dynamic require() with a static string path or refactor to use ES module import().',
+  'import/no-webpack-loader-syntax':
+    'Remove the Webpack loader prefix (!) from the import path. Configure loaders in the Webpack config instead.',
+  'import/no-self-import':
+    'This module imports itself — likely a refactoring mistake. Remove the self-import or change it to the intended module.',
+  'import/no-cycle':
+    'Break the circular dependency. Extract shared code into a separate module that both sides can import, use dependency injection, or restructure the module boundaries. Do not just move the import to a different line.',
   'import/no-useless-path-segments':
-    'Simplify the import path by removing unnecessary path segments.',
+    'Simplify the import path by removing unnecessary segments (extra ../, double slashes, trailing /index).',
   'import/no-relative-packages':
-    'Do not use relative imports to access packages. Use the package name.',
+    'Import the sibling package by its package name instead of a relative path.',
 
   // Strict
-  strict: 'Fix the strict mode directive per project configuration.',
+  strict:
+    'Fix the "use strict" directive placement per the project ESLint config. In ES modules, remove it entirely — modules are strict by default.',
 };
 
 export default defaultRuleMessages;
