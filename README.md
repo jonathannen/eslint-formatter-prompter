@@ -4,7 +4,7 @@ Your linter is already talking to your AI — this makes it say the right things
 
 **This is an experiment.** We think there's something here, but the approach is early and evolving. If you try it, we'd love to hear what works, what doesn't, and what you'd change — [open an issue](https://github.com/jonathannen/eslint-prompter/issues) or reach out.
 
-`eslint-formatter-prompter` is a concrete implementation of the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) approach. It replaces ESLint's default output with structured, directive messages that tell AI _what to fix_ and _why_ — instead of dumping raw lint errors and hoping it figures it out.
+`eslint-formatter-prompter` is a concrete implementation of the [Tool Augmented Prompting](https://jonathannen.com/build-tools-to-prompt/) approach. It's a ESLint formatter plugin that produces structured, directive messages that tell AI _what to fix_ and _why_ — instead of dumping raw lint errors and hoping it figures it out.
 
 ## Why?
 
@@ -48,7 +48,7 @@ The real power comes from running this automatically. Use a [Claude Code PostToo
 }
 ```
 
-Now every time the AI writes a file, it immediately sees actionable lint feedback — creating the tight feedback loop described in [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/).
+Now every time the AI writes a file, it immediately sees actionable lint feedback — creating the tight feedback loop described in [Tool Augmented Prompting](https://jonathannen.com/build-tools-to-prompt/).
 
 ## Example output
 
@@ -114,7 +114,7 @@ The built-in messages are a solid starting point, but they are generic by defini
 
 A built-in message can say "Remove the console statement." A custom message can say "Remove console statements. Use the logger from @app/logging instead — see src/lib/logger.ts for usage." The difference is the AI knowing exactly what to replace it with, not just what to remove.
 
-Following the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) philosophy, the best custom messages:
+Following the [Tool Augmented Prompting](https://jonathannen.com/build-tools-to-prompt/) philosophy, the best custom messages:
 
 - **Point to your code** — `"Use the db.query() wrapper from @app/db — see src/modules/users/queries.ts for the pattern"` gives the AI a gold template to follow.
 - **State your why** — `"Direct queries bypass audit logging"` prevents the AI from finding a clever workaround that still violates the intent.

@@ -83,17 +83,27 @@ export function formatResults(results: ESLint.LintResult[], options: PrompterCon
 
   const grouped = groupByRule(filesWithIssues);
 
+  // Rules where individual line violations are noise — just list affected files
+  const fileOnlyRules = new Set(['prettier/prettier']);
+
   for (const [ruleId, group] of grouped) {
     const customMsg = getRuleMessage(ruleId, ruleMessages);
     const ruleLabel = customMsg ? `**${ruleId}**: ${customMsg}` : `**${ruleId}**`;
     parts.push(ruleLabel);
 
-    for (const v of group.violations) {
-      const msg = v.message;
-      const filePrefix = multiFile ? `${relativePath(v.filePath, cwd)} ` : '';
-      parts.push(
-        `- ${filePrefix}Line ${msg.line}, Col ${msg.column} (${severityLabel(msg.severity)}): ${msg.message}`,
-      );
+    if (fileOnlyRules.has(ruleId)) {
+      const files = [...new Set(group.violations.map((v) => relativePath(v.filePath, cwd)))];
+      for (const file of files) {
+        parts.push(`- ${file}`);
+      }
+    } else {
+      for (const v of group.violations) {
+        const msg = v.message;
+        const filePrefix = multiFile ? `${relativePath(v.filePath, cwd)} ` : '';
+        parts.push(
+          `- ${filePrefix}Line ${msg.line}, Col ${msg.column} (${severityLabel(msg.severity)}): ${msg.message}`,
+        );
+      }
     }
 
     parts.push('');
