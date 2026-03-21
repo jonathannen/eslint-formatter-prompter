@@ -3,6 +3,7 @@
  * Each message tells the AI exactly what to do and what NOT to do,
  * preventing common incorrect fixes.
  */
+
 const defaultRuleMessages: Record<string, string> = {
   // Possible Errors
   'no-console':
@@ -258,7 +259,7 @@ const defaultRuleMessages: Record<string, string> = {
 
   // Prettier
   'prettier/prettier':
-    'Fix the formatting issue. Run the prettier auto-fix (e.g., `npx prettier --write <file>`) rather than fixing by hand.',
+    'Fix the formatting issues by running `npx prettier --write` on the affected files, or re-run ESLint with `--fix`. Do not fix formatting by hand.',
 
   // Strict
   strict:
