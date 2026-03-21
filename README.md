@@ -4,7 +4,7 @@ Your linter is already talking to your AI — this makes it say the right things
 
 **This is an experiment.** We think there's something here, but the approach is early and evolving. If you try it, we'd love to hear what works, what doesn't, and what you'd change — [open an issue](https://github.com/jonathannen/eslint-prompter/issues) or reach out.
 
-`eslint-formatter-prompter` is a concrete implementation of the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) approach. It replaces ESLint's default output with structured, directive messages that tell AI _what to fix_ and _why_ — instead of dumping raw lint errors and hoping it figures it out.
+`eslint-formatter-prompter` is a concrete implementation of the [Build Tools to Prompt](https://jonathannen.com/build-tools-to-prompt/) approach. It's a ESLint formatter plugin that produces structured, directive messages that tell AI _what to fix_ and _why_ — instead of dumping raw lint errors and hoping it figures it out.
 
 ## Why?
 
